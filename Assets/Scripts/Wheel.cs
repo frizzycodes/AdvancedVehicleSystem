@@ -19,7 +19,10 @@ public class Wheel : MonoBehaviour
 
     [Header("Wheel")]
     public float wheelRadius = 0.34f; // radius of the tire (used to convert raycast distance into suspension length)
-
+    private Vector3 wheelLocalVelocity; // velocity of the wheel in local space (used for advanced traction calculations, not implemented in this basic suspension script)
+    private Vector3 wheelWorldVelocity; // velocity of the wheel in world space (used for advanced traction calculations, not implemented in this basic suspension script)
+    private float forwardVelocity; // component of the wheel's velocity in the forward direction (used for traction calculations, not implemented here)
+    private float sidewaysVelocity; // component of the wheel's velocity in the sideways direction (used for traction calculations, not implemented here)
     void Start()
     {
         rb = transform.root.GetComponent<Rigidbody>(); // get the Rigidbody from the root object (the main car body)
@@ -70,6 +73,16 @@ public class Wheel : MonoBehaviour
             rb.AddForceAtPosition(suspensionForce,hit.point); // apply the suspension force to the Rigidbody at the wheel's contact location
 
             previousSpringLength = currentSpringLength; // store the current spring length for use in the next physics frame
+            
+            wheelWorldVelocity = rb.GetPointVelocity(hit.point); // get the velocity of the wheel's contact point in world space (used for potential traction calculations, not implemented here)
+            wheelLocalVelocity = transform.InverseTransformDirection(wheelWorldVelocity); // convert world velocity to local space for potential traction calculations (not implemented here)
+
+            forwardVelocity = wheelLocalVelocity.z; // extract forward velocity component (used for traction calculations, not implemented here)
+            sidewaysVelocity = wheelLocalVelocity.x; // extract sideways velocity component (used for traction calculations
+
+            Debug.DrawRay(hit.point, wheelWorldVelocity * 5f, Color.yellow); // draw the wheel's contact point velocity in world space for debugging
+            Debug.DrawRay(hit.point, transform.forward * forwardVelocity * 5f, Color.blue); // draw the wheel's forward velocity component in local space for debugging 
+            Debug.DrawRay(hit.point, transform.right * sidewaysVelocity * 5f, Color.cyan); // draw the wheel's sideways velocity component in local space for debugging
         }
         else
         {
@@ -77,6 +90,7 @@ public class Wheel : MonoBehaviour
 
             previousSpringLength = currentSpringLength; // update previous length to avoid large velocity spikes when contact returns
         }
+
     }
 
     void Update()
