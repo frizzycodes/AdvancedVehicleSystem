@@ -3,30 +3,30 @@ using UnityEngine.InputSystem;
 
 public class CarController : MonoBehaviour
 {
-    // Array containing references to all wheels attached to the car.
-    // Each Wheel script handles suspension physics and tire forces.
+    // Array containing references to all wheels attached to the vehicle.
+    // Each wheel handles its own suspension and tire physics.
     public Wheel[] wheels;
 
-    // Rigidbody representing the physical body of the car.
-    // All forces from the wheels will ultimately act on this body.
+    // Rigidbody representing the vehicle body.
+    // All forces from wheels are applied to this object.
     private Rigidbody rb;
 
-    // PlayerInput component from Unity's new Input System.
-    // Used to read player actions (throttle, steering, etc.).
+    // PlayerInput component from Unity's Input System.
+    // Used to access input actions defined in the Input Actions asset.
     private PlayerInput input;
 
-    // Cached reference to the "Drive" input action.
-    // This avoids repeated string lookups every frame.
+    // Cached reference to the "Drive" action.
+    // This avoids repeated dictionary lookups every frame.
     private InputAction driveAction;
 
     [Header("Engine")]
 
-    // Maximum engine force applied to driven wheels.
-    // This is a simplified drive force used for acceleration.
-    public float motorForce = 8000f;
+    // Maximum drive force sent to driven wheels.
+    // This represents engine output in a simplified form.
+    public float driveForce = 8000f;
 
-    // Current throttle value coming from player input.
-    // Expected range:
+    // Current throttle input from the player.
+    // Range typically:
     // -1 = reverse / braking
     //  0 = no throttle
     //  1 = full acceleration
@@ -34,27 +34,27 @@ public class CarController : MonoBehaviour
 
     void Awake()
     {
-        // Retrieve the PlayerInput component attached to the car.
+        // Retrieve the PlayerInput component attached to this object.
         input = GetComponent<PlayerInput>();
 
-        // Enable all input actions so they start receiving input.
+        // Enable all input actions.
         input.actions.Enable();
 
-        // Cache the Drive action for efficient access later.
+        // Cache the "Drive" input action for performance.
         driveAction = input.actions["Drive"];
     }
 
     void Start()
     {
-        // Retrieve the Rigidbody attached to the car body.
+        // Retrieve the Rigidbody that represents the vehicle body.
         rb = GetComponent<Rigidbody>();
 
-        // Lower the center of mass slightly.
-        // This improves stability and reduces rollover tendency.
-        rb.centerOfMass = new Vector3(0, -0.35f, 0);
+        // Lower the center of mass slightly to improve stability
+        // and reduce the likelihood of the car rolling over.
+        rb.centerOfMass = new Vector3(0f, -0.35f, 0f);
 
-        // Initialize each wheel with a reference to the car's Rigidbody.
-        // This allows wheels to apply suspension and tire forces to the car body.
+        // Initialize all wheels with a reference to the vehicle Rigidbody.
+        // This allows them to apply suspension and tire forces.
         foreach (Wheel wheel in wheels)
         {
             wheel.Initialize(rb);
@@ -63,18 +63,18 @@ public class CarController : MonoBehaviour
 
     void Update()
     {
-        // Read throttle input from the Drive action.
-        // Values come from the input bindings (e.g. W/S keys).
+        // Read throttle input from the player.
+        // This value will be forwarded to the wheels in FixedUpdate.
         throttleInput = driveAction.ReadValue<float>();
     }
 
     void FixedUpdate()
     {
-        // Send the current throttle value to each wheel during the physics step.
-        // Wheels will use this to apply drive force at their contact point.
+        // Send throttle information to each wheel during the physics step.
+        // Each driven wheel will apply engine force at its contact point.
         foreach (Wheel wheel in wheels)
         {
-            wheel.SetThrottle(throttleInput, motorForce);
+            wheel.SetThrottle(throttleInput, driveForce);
         }
     }
 }
