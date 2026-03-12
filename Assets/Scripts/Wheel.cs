@@ -2,60 +2,45 @@ using UnityEngine;
 
 public class Wheel : MonoBehaviour
 {
-    // Reference to the vehicle Rigidbody
+    // Vehicle rigidbody reference
     private Rigidbody rb;
 
     [Header("Suspension")]
 
-    // Suspension rest length (equilibrium spring length)
     public float restLength = 0.45f;
-
-    // Maximum suspension compression / extension distance
     public float suspensionTravel = 0.20f;
-
-    // Spring stiffness (Hooke's law coefficient)
     public float springStrength = 60000f;
-
-    // Damper coefficient to reduce oscillation
     public float damperStrength = 6500f;
 
-    // Suspension limits
     private float minLength;
     private float maxLength;
 
-    // Spring length tracking
     private float currentSpringLength;
     private float previousSpringLength;
 
-    // Final suspension force
     private Vector3 suspensionForce;
 
     [Header("Wheel")]
 
-    // Tire radius
     public float wheelRadius = 0.34f;
 
-    // Determines whether this wheel receives engine power
     public bool isDrivenWheel = true;
+    public bool isSteeringWheel = true;
+    public float maxSteerAngle = 35f;
 
     [Header("Tire Physics")]
 
-    // Tire stiffness in longitudinal direction (acceleration/braking)
     public float longitudinalStiffness = 1.0f;
+    public float lateralStiffness = 2500f; // lower for stability
 
-    // Tire stiffness in lateral direction (cornering)
-    public float lateralStiffness = 12000f;
-
-    // Velocity at contact patch
     private Vector3 contactVelocityWorld;
     private Vector3 contactVelocityLocal;
 
-    // Velocity components in tire coordinate system
     private float longitudinalVelocity;
     private float lateralVelocity;
 
-    // Input values from CarController
     private float throttleInput;
+    private float steeringInput;
     private float driveForce;
 
     public void Initialize(Rigidbody carRb)
@@ -69,9 +54,13 @@ public class Wheel : MonoBehaviour
         driveForce = force;
     }
 
+    public void SetSteering(float input)
+    {
+        steeringInput = input;
+    }
+
     void Start()
     {
-        // Calculate suspension limits
         minLength = restLength - suspensionTravel;
         maxLength = restLength + suspensionTravel;
 
@@ -84,13 +73,20 @@ public class Wheel : MonoBehaviour
 
         Debug.DrawRay(transform.position, -transform.up * rayLength, Color.red);
 
+        // Apply steering rotation
+        if (isSteeringWheel)
+        {
+            float steerAngle = steeringInput * maxSteerAngle;
+            transform.localRotation = Quaternion.Euler(0f, steerAngle, 0f);
+        }
+
         if (Physics.Raycast(transform.position, -transform.up, out RaycastHit hit, rayLength))
         {
             Debug.DrawRay(hit.point, hit.normal, Color.green);
 
-            //--------------------------------
-            // Suspension physics
-            //--------------------------------
+            //-------------------------
+            // Suspension
+            //-------------------------
 
             currentSpringLength = hit.distance - wheelRadius;
             currentSpringLength = Mathf.Clamp(currentSpringLength, minLength, maxLength);
@@ -104,15 +100,17 @@ public class Wheel : MonoBehaviour
 
             float damperForce = damperStrength * springVelocity;
 
-            suspensionForce = Mathf.Max(0f, springForce - damperForce) * hit.normal;
+            float normalForce = Mathf.Max(0f, springForce - damperForce);
+
+            suspensionForce = normalForce * hit.normal;
 
             rb.AddForceAtPosition(suspensionForce, hit.point);
 
             previousSpringLength = currentSpringLength;
 
-            //--------------------------------
+            //-------------------------
             // Contact patch velocity
-            //--------------------------------
+            //-------------------------
 
             contactVelocityWorld = rb.GetPointVelocity(hit.point);
 
@@ -122,17 +120,17 @@ public class Wheel : MonoBehaviour
             longitudinalVelocity = contactVelocityLocal.z;
             lateralVelocity = contactVelocityLocal.x;
 
-            //--------------------------------
-            // Debug visualization
-            //--------------------------------
+            //-------------------------
+            // Debug
+            //-------------------------
 
             Debug.DrawRay(hit.point, contactVelocityWorld * 5f, Color.yellow);
             Debug.DrawRay(hit.point, transform.forward * longitudinalVelocity * 5f, Color.blue);
             Debug.DrawRay(hit.point, transform.right * lateralVelocity * 5f, Color.cyan);
 
-            //--------------------------------
-            // Longitudinal tire force
-            //--------------------------------
+            //-------------------------
+            // Drive force
+            //-------------------------
 
             if (isDrivenWheel)
             {
@@ -145,14 +143,15 @@ public class Wheel : MonoBehaviour
                 rb.AddForceAtPosition(driveForceVector, hit.point);
             }
 
-            //--------------------------------
-            // Lateral tire force
-            //--------------------------------
+            //-------------------------
+            // Lateral tire force (stable model)
+            //-------------------------
 
-            float lateralForceMagnitude = -lateralVelocity * lateralStiffness;
+            Vector3 lateralDirection =
+                Vector3.ProjectOnPlane(transform.right, hit.normal).normalized;
 
             Vector3 lateralForce =
-                transform.right * lateralForceMagnitude;
+                -lateralDirection * lateralVelocity * lateralStiffness;
 
             rb.AddForceAtPosition(lateralForce, hit.point);
         }

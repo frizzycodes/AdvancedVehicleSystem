@@ -18,6 +18,7 @@ public class CarController : MonoBehaviour
     // Cached reference to the "Drive" action.
     // This avoids repeated dictionary lookups every frame.
     private InputAction driveAction;
+    private InputAction steerAction;
 
     [Header("Engine")]
 
@@ -31,6 +32,7 @@ public class CarController : MonoBehaviour
     //  0 = no throttle
     //  1 = full acceleration
     private float throttleInput;
+    private float steeringInput;
 
     void Awake()
     {
@@ -42,6 +44,7 @@ public class CarController : MonoBehaviour
 
         // Cache the "Drive" input action for performance.
         driveAction = input.actions["Drive"];
+        steerAction = input.actions["Steer"];
     }
 
     void Start()
@@ -66,6 +69,7 @@ public class CarController : MonoBehaviour
         // Read throttle input from the player.
         // This value will be forwarded to the wheels in FixedUpdate.
         throttleInput = driveAction.ReadValue<float>();
+        steeringInput = steerAction.ReadValue<float>();
     }
 
     void FixedUpdate()
@@ -75,6 +79,7 @@ public class CarController : MonoBehaviour
         foreach (Wheel wheel in wheels)
         {
             wheel.SetThrottle(throttleInput, driveForce);
+            wheel.SetSteering(steeringInput);
         }
     }
 }
