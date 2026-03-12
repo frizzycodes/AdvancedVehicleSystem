@@ -659,7 +659,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 397256615}
   serializedVersion: 5
-  m_Mass: 1410
+  m_Mass: 1600
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -675,7 +675,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &397256618
@@ -695,7 +695,7 @@ MonoBehaviour:
   - {fileID: 1814386963}
   - {fileID: 1578604536}
   - {fileID: 650399767}
-  motorForce: 8000
+  driveForce: 8000
 --- !u!114 &397256619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -723,7 +723,7 @@ MonoBehaviour:
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: df70fa95-8a34-4494-b137-73ab6b9c7d37
+  m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!1 &460767837
@@ -1103,12 +1103,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7abb9beb189260a42af959fe8b111a23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Wheel
-  restLength: 0.5
-  suspensionTravel: 0.3
-  springStrength: 20000
-  damperStrength: 2000
-  wheelRadius: 0
-  isDrivenWheel: 0
+  restLength: 0.45
+  suspensionTravel: 0.2
+  springStrength: 60000
+  damperStrength: 6500
+  wheelRadius: 0.33
+  isDrivenWheel: 1
+  isSteeringWheel: 0
+  maxSteerAngle: 35
+  longitudinalStiffness: 1
+  lateralStiffness: 18000
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1202,12 +1206,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7abb9beb189260a42af959fe8b111a23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Wheel
-  restLength: 0.5
-  suspensionTravel: 0.3
-  springStrength: 20000
-  damperStrength: 2000
-  wheelRadius: 0
-  isDrivenWheel: 0
+  restLength: 0.45
+  suspensionTravel: 0.2
+  springStrength: 60000
+  damperStrength: 6500
+  wheelRadius: 0.33
+  isDrivenWheel: 1
+  isSteeringWheel: 0
+  maxSteerAngle: 35
+  longitudinalStiffness: 1
+  lateralStiffness: 18000
 --- !u!1 &1769947502
 GameObject:
   m_ObjectHideFlags: 0
@@ -1735,12 +1743,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7abb9beb189260a42af959fe8b111a23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Wheel
-  restLength: 0.5
-  suspensionTravel: 0.3
-  springStrength: 20000
-  damperStrength: 2000
-  wheelRadius: 0
-  isDrivenWheel: 1
+  restLength: 0.45
+  suspensionTravel: 0.2
+  springStrength: 60000
+  damperStrength: 6500
+  wheelRadius: 0.33
+  isDrivenWheel: 0
+  isSteeringWheel: 1
+  maxSteerAngle: 35
+  longitudinalStiffness: 1
+  lateralStiffness: 18000
 --- !u!1 &1971405833
 GameObject:
   m_ObjectHideFlags: 0
@@ -1785,12 +1797,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7abb9beb189260a42af959fe8b111a23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Wheel
-  restLength: 0.5
-  suspensionTravel: 0.3
-  springStrength: 20000
-  damperStrength: 2000
-  wheelRadius: 0
-  isDrivenWheel: 1
+  restLength: 0.45
+  suspensionTravel: 0.2
+  springStrength: 60000
+  damperStrength: 6500
+  wheelRadius: 0.33
+  isDrivenWheel: 0
+  isSteeringWheel: 1
+  maxSteerAngle: 35
+  longitudinalStiffness: 1
+  lateralStiffness: 18000
 --- !u!1 &2018123584
 GameObject:
   m_ObjectHideFlags: 0
